@@ -5,7 +5,7 @@ export function clearScreen(ctx: CanvasRenderingContext2D): void {
 
 let sizeX: number;
 let sizeY: number;
-let data: string[][];
+let prevFrame: string[][];
 
 /* 
     This function takes in a frame, and a text elemtn and places the top left of the element at the x, y coordinates
@@ -57,15 +57,13 @@ export function update(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D,
         return;
     }
 
-    if (sizeX === screen.width && sizeY === screen.height && data == frame) {
+    /* if (prevFrame === frame) {
         return;
-    }
+    } */
 
     console.log('Updating canvas...');
 
-    sizeX = screen.width;
-    sizeY = screen.height;
-    data = frame;
+    prevFrame = frame;
 
     clearScreen(ctx);
 
@@ -73,11 +71,11 @@ export function update(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D,
     ctx.font = `${size}px Courier New`;
     ctx.fillStyle = "#c9c9c9";
 
-    for (let y = 0; y < data.length; y++) {
-        if (!data[y]) {
+    for (let y = 0; y < frame.length; y++) {
+        if (!frame[y]) {
             break;
         }
-        let line = data[y].join('');
+        let line = frame[y].join('');
         ctx.fillText(line, size / 3, ((y * size) + (size/1.2)));
     }
 }

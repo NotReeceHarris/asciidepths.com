@@ -8,13 +8,15 @@
 
     import { onMount, onDestroy } from "svelte";
     import { io, Socket } from "socket.io-client";
-    import * as canvasUtils from "$lib/canvas";
+
+    import * as canvi from "$lib/canvi";
     import * as ascii from "$lib/ascii";
+    import * as menus from "$lib/menus";
 
     let canvas: HTMLCanvasElement;
 
-    let data: string[][];
-    let timer: ReturnType<typeof setInterval>;
+    let frame: string[][];
+    let clock: ReturnType<typeof setInterval>;
     let socket: Socket;
 
     onMount(() => {
@@ -34,34 +36,34 @@
 
         canvas.width = 1500 * 1.5;
         canvas.height = 750 * 1.5;
-        canvasUtils.update(canvas, ctx, data);
-
-        timer = setInterval(() => {
-            canvasUtils.update(canvas, ctx, data);
-        });
 
         const size = 25;
         const charsPerRow = Math.floor(canvas.width / (size / 1.67)) - 1;
         const charsPerCol = Math.floor(canvas.height / size);
-        let frame = Array.from({ length: charsPerCol }, () =>
-            Array(charsPerRow).fill("`"),
-        );
 
-        frame = canvasUtils.place(
-            frame,
-            ascii.sword,
-            Math.floor(charsPerRow / 2) - 3,
-            Math.floor(charsPerCol / 2),
-            true,
-        );
+        frame = menus.start(charsPerRow, charsPerCol)
 
-        data = frame;
+        let counter = 0
+        clock = setInterval(() => {
+
+            frame = canvi.place(
+                frame,
+                counter.toString(),
+                0,
+                0,
+                false, 
+            );
+
+            canvi.update(canvas, ctx, frame);
+            counter++
+
+        }, 1000 / 30);
     });
 
     onDestroy(() => {
-        if (timer) {
-            clearInterval(timer);
-            console.log("Timer cleared");
+        if (clock) {
+            clearInterval(clock);
+            console.log("Clock cleared");
         }
 
         if (socket) {
