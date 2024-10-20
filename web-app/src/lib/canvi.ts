@@ -57,13 +57,12 @@ export function update(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D,
         return;
     }
 
-    /* if (prevFrame === frame) {
+    if (prevFrame === frame) {
         return;
-    } */
+    }
 
-    console.log('Updating canvas...');
-
-    prevFrame = frame;
+    // Save the frame so we can compare it next time, have to do this because arrays are passed by reference
+    prevFrame = JSON.parse(JSON.stringify(frame));
 
     clearScreen(ctx);
 

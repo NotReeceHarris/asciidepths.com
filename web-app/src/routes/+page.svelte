@@ -34,8 +34,8 @@
             throw new Error("2d context not supported");
         }
 
-        canvas.width = 1500 * 1.5;
-        canvas.height = 750 * 1.5;
+        canvas.width = 2550;
+        canvas.height = 1275;
 
         const size = 25;
         const charsPerRow = Math.floor(canvas.width / (size / 1.67)) - 1;
@@ -43,21 +43,20 @@
 
         frame = menus.start(charsPerRow, charsPerCol)
 
-        let counter = 0
+        let counter = 0;
         clock = setInterval(() => {
 
             frame = canvi.place(
-                frame,
-                counter.toString(),
-                0,
+                menus.start(charsPerRow, charsPerCol),
+                ascii.character.walkingRight[counter % ascii.character.walkingLeft.length],
+                counter % 20,
                 0,
                 false, 
             );
 
             canvi.update(canvas, ctx, frame);
-            counter++
-
-        }, 1000 / 30);
+            counter++;
+        }, 1000 / 7);
     });
 
     onDestroy(() => {
