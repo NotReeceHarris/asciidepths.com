@@ -7,73 +7,26 @@
     import SignInButton from "clerk-sveltekit/client/SignInButton.svelte";
 
     import { onMount, onDestroy } from "svelte";
-    import { io, Socket } from "socket.io-client";
-
-    import * as canvi from "$lib/canvi";
-    import * as ascii from "$lib/ascii";
-    import * as menus from "$lib/menus";
+    import { AppGlobals } from "$lib/globals";
+    import { start } from "$lib/index";
 
     let canvas: HTMLCanvasElement;
-
-    let frame: string[][];
-    let clock: ReturnType<typeof setInterval>;
-    let socket: Socket;
+    let globals: AppGlobals;
 
     onMount(() => {
-        socket = io("ws://localhost:3000/", {
-            reconnectionDelayMax: 10000,
-        });
-
-        if (!canvas) {
-            throw new Error("Canvas not found");
-        }
-
-        const ctx = canvas.getContext("2d");
-
-        if (!ctx) {
-            throw new Error("2d context not supported");
-        }
-
-        canvas.width = 2550;
-        canvas.height = 1275;
-
-        const size = 25;
-        const charsPerRow = Math.floor(canvas.width / (size / 1.67)) - 1;
-        const charsPerCol = Math.floor(canvas.height / size);
-
-        frame = menus.landing;
-
-        let counter = 0;
-        clock = setInterval(() => {
-            let newframe = canvi.place(
-                frame,
-                ascii.character.walkingRight[
-                    counter % ascii.character.walkingLeft.length
-                ],
-                counter % 20,
-                0,
-                false,
-            );
-
-            canvi.update(canvas, ctx, newframe);
-            counter++;
-        }, 1000 / 7);
+        if (!canvas) throw new Error("Canvas not found");
+        globals = new AppGlobals(canvas);
+        start(globals);
     });
 
     onDestroy(() => {
-        if (clock) {
-            clearInterval(clock);
-            console.log("Clock cleared");
-        }
-
-        if (socket) {
-            socket.disconnect();
-            console.log("Socket disconnected");
+        if (globals) {
+            globals.stopClock();
+            globals.disconnect();
         }
 
         if (canvas) {
             canvas.remove();
-            console.log("Canvas removed");
         }
     });
 </script>
@@ -84,7 +37,10 @@
     >
         <h1 class="text-lg">ASCII Depths</h1>
         <div class="flex gap-4 place-items-center">
-            <a href="https://github.com/NotReeceHarris/asciidepths.com" target="_blank">
+            <a
+                href="https://github.com/NotReeceHarris/asciidepths.com"
+                target="_blank"
+            >
                 <svg
                     class="size-5"
                     viewBox="0 0 160 160"
@@ -104,13 +60,29 @@
             </SignedIn>
             <SignedOut>
                 <SignInButton>
-                    <svg class="size-5 p-[1px]" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+                    <svg
+                        class="size-5 p-[1px]"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        ><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"
+                        ></path><polyline points="10 17 15 12 10 7"
+                        ></polyline><line x1="15" y1="12" x2="3" y2="12"
+                        ></line></svg
+                    >
                 </SignInButton>
             </SignedOut>
         </div>
     </div>
-    <canvas bind:this={canvas} class="z-20 w-screen max-h-[calc(100vh-28px-8px)] p-2 pt-4 mx-auto aspect-[2/1]" />
-    <div class="absolute text-white top-[calc(50vh-12px)]">
-        Loading...
-    </div>
+    <canvas
+        bind:this={canvas}
+        class="z-20 w-screen max-h-[calc(100vh-28px-8px)] p-2 pt-4 mx-auto aspect-[2/1]"
+    />
+    <div class="absolute text-white top-[calc(50vh-12px)]">Loading...</div>
 </div>

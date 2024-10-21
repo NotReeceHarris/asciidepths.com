@@ -1,6 +1,5 @@
-import { json } from "@sveltejs/kit";
-
 export function clearScreen(ctx: CanvasRenderingContext2D): void {
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     ctx.fillStyle = '#121212';
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 }
@@ -9,74 +8,97 @@ let sizeX: number;
 let sizeY: number;
 let prevFrame: string[][];
 
-/* 
-    This function takes in a frame, and a text elemtn and places the top left of the element at the x, y coordinates
-    of the canvas. It returns the new frame with the text element placed on it. the text element may  have multiple lines or 
-    have multiple characters per line.
-
-    center boolean places the element at X, Y coordinate however it sets the element origin to the center of the element
-*/
+/**
+ * Places a text element onto a frame at specified coordinates.
+ * 
+ * @param {string[][]} frame - The current frame represented as a 2D array of strings.
+ * @param {string | string[]} text - The text element to be placed, can be a single string or an array of strings.
+ * @param {number} X - The X coordinate where the top-left corner of the text element will be placed.
+ * @param {number} Y - The Y coordinate where the top-left corner of the text element will be placed.
+ * @param {boolean} [center=false] - If true, the text element will be centered at the (X, Y) coordinates.
+ * @returns {string[][]} - The new frame with the text element placed on it.
+ */
 export function place(frame: string[][], text: string | string[], X: number, Y: number, center: boolean = false): string[][] {
+    // Ensure text is a string
+    if (Array.isArray(text)) text = text[0];
 
-    if (typeof text === 'object') {
-        text = text[0]
-    }
+    // Split the text into lines based on newline characters
+    const lines = text.split('\n');
 
-    let lines = text.split('\n');
-    let newFrame = JSON.parse(JSON.stringify(frame)); // Deep copy the frame
+    // Create a deep copy of the frame
+    const newFrame = frame.map(row => [...row]);
 
+    // Adjust the X and Y coordinates if the text should be centered
     if (center) {
-        X = X - Math.floor(lines[0].length / 2);
-        Y = Y - Math.floor(lines.length / 2) + 1;
+        X -= Math.floor(lines[0].length / 2);
+        Y -= Math.floor(lines.length / 2) + 1;
     }
 
+    // Iterate over each line of the text
     for (let y = 0; y < lines.length; y++) {
         const line = lines[y];
 
+        // Iterate over each character in the line
         for (let x = 0; x < line.length; x++) {
-            const char = line.split('')[x];
+            const char = line[x];
 
-            if (char == '╶') {
+            // Skip the character if it is '╶'
+            if (char === '╶') {
                 continue;
             }
 
-            if (Y + y < 0 || Y + y >= frame.length) {
-                continue;
-            }
+            // Calculate the new coordinates for the character
+            const newY = Y + y;
+            const newX = X + x;
 
-            newFrame[Y + y][X + x] = char;
+            // Check if the new coordinates are within the bounds of the frame
+            if (newY >= 0 && newY < frame.length && newX >= 0 && newX < frame[0].length) {
+                // Place the character in the new frame
+                newFrame[newY][newX] = char;
+            }
         }
-
     }
 
+    // Return the new frame with the text placed on it
     return newFrame;
 }
 
-export function update(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, frame: string[][]): void {
-
-    if (!canvas || !ctx || !frame) {
-        console.log('Canvas or context not found');
+/**
+ * Updates the canvas with the provided frame.
+ * 
+ * @param {CanvasRenderingContext2D} ctx - The 2D rendering context for the canvas.
+ * @param {string[][]} frame - The frame to be rendered on the canvas.
+ */
+export function update(ctx: CanvasRenderingContext2D, frame: string[][]): void {
+    // Check if the frame is not defined
+    if (!frame) {
+        console.log('Frame not found');
         return;
     }
 
+    // Check if the current frame is the same as the previous frame
     if (prevFrame === frame) {
         return;
     }
 
     // Save the frame so we can compare it next time, have to do this because arrays are passed by reference
-    prevFrame = JSON.parse(JSON.stringify(frame));
+    prevFrame = frame.map(row => [...row]);
 
+    // Clear the canvas before drawing the new frame
     clearScreen(ctx);
 
+    // Set the font size and style for the text
     const size = 25;
     ctx.font = `${size}px Courier New`;
     ctx.fillStyle = "#c9c9c9";
 
+    // Iterate over each row in the frame
     for (let y = 0; y < frame.length; y++) {
+        // If the row is not defined, break the loop
         if (!frame[y]) {
             break;
         }
-        let line = frame[y].join('');
-        ctx.fillText(line, size / 3, ((y * size) + (size/1.2)));
+        // Draw the text on the canvas at the specified position
+        ctx.fillText(frame[y].join(''), size / 3, ((y * size) + (size / 1.2)));
     }
 }
