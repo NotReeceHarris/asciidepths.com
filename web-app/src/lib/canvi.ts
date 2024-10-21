@@ -1,12 +1,26 @@
+/**
+ * The previous frame rendered on the canvas.
+ * Used to compare with the current frame to determine if an update is necessary.
+ * 
+ * @type {string[][]}
+ */
+let prevFrame: string[][];
+
+/**
+ * Clears the entire canvas and fills it with a specified background color.
+ * 
+ * @param {CanvasRenderingContext2D} ctx - The 2D rendering context for the canvas.
+ */
 export function clearScreen(ctx: CanvasRenderingContext2D): void {
+    // Clear the entire canvas
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    
+    // Set the fill color to a dark gray
     ctx.fillStyle = '#121212';
+    
+    // Fill the entire canvas with the fill color
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 }
-
-let sizeX: number;
-let sizeY: number;
-let prevFrame: string[][];
 
 /**
  * Places a text element onto a frame at specified coordinates.

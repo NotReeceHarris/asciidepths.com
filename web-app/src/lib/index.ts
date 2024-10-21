@@ -1,6 +1,6 @@
 import { AppGlobals } from "./globals";
 import * as canvi from "./canvi";
-import * as menus from "./menus";
+import * as menus from "./frames";
 import * as ascii from "./ascii";
 
 /**

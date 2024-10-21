@@ -1,5 +1,5 @@
 import { io, Socket } from "socket.io-client";
-import * as menus from "$lib/menus";
+import * as menus from "$lib/frames";
 import * as canvi from "$lib/canvi";
 
 /**

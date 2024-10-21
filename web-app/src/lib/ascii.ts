@@ -1,14 +1,12 @@
 /* 
-
 The character "╶" is replaced by whatever character is already in the cell.
-
 */
 
 export const character = {
     walkingRight: [
 `╶o
 /|\\
-/ \\`,
+/╶\\`,
 `╶o
 /|\\
 ╶>\\`,
@@ -22,7 +20,7 @@ export const character = {
     walkingLeft: [
 `╶o
 /|\\
-/ \\`,
+/╶\\`,
 `╶o
 /|\\
 /<`,

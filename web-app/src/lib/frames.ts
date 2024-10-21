@@ -1,9 +1,21 @@
-export function start(charsPerRow: number, charsPerCol: number): string[][] {
-    return Array.from({ length: charsPerCol }, () =>Array(charsPerRow).fill("`"));
-} 
+/**
+ * Converts a string representation of a frame into a 2D array of characters.
+ * Each line in the string becomes a row in the 2D array, and each character in the line becomes an element in the row.
+ * 
+ * @param {string} string - The string representation of the frame.
+ * @returns {string[][]} - The 2D array representation of the frame.
+ */
+function convert2frame(string: String): string[][] {
 
+    if (string.trim().replaceAll("\n",'').length !== 169 * 51) {
+        new Error(`The frame is not the correct size. (provided ${string.trim().split('\n')[0].length}x${string.trim().split('\n').length}, expected 169x51)`);
+        return Array(51).fill(`INCORRECT FRAME SIZE (provided ${string.trim().split('\n')[0].length}x${string.trim().split('\n').length}, expected 169x51)`.repeat(3).split(''));
+    }
 
-export const landing = `
+    return string.trim().split("\n").map(row => row.split(""));
+}
+
+export const landing = convert2frame(`
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -55,4 +67,4 @@ export const landing = `
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-`.trim().split("\n").map(row => row.split(""));
+`);
