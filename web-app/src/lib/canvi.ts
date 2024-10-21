@@ -1,3 +1,5 @@
+import { json } from "@sveltejs/kit";
+
 export function clearScreen(ctx: CanvasRenderingContext2D): void {
     ctx.fillStyle = '#121212';
     ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -21,7 +23,7 @@ export function place(frame: string[][], text: string | string[], X: number, Y: 
     }
 
     let lines = text.split('\n');
-    let newFrame = frame;
+    let newFrame = JSON.parse(JSON.stringify(frame)); // Deep copy the frame
 
     if (center) {
         X = X - Math.floor(lines[0].length / 2);
@@ -42,7 +44,7 @@ export function place(frame: string[][], text: string | string[], X: number, Y: 
                 continue;
             }
 
-            frame[Y + y][X + x] = char;
+            newFrame[Y + y][X + x] = char;
         }
 
     }
