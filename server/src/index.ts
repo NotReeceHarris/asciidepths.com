@@ -19,6 +19,6 @@ io.on("connection", (socket: Socket) => {
 
 });
 
-httpServer.listen(3000, () => {
-  console.log('Server is listening on port 3000');
+httpServer.listen(8008, () => {
+  console.log('Server is listening on port 8008');
 });

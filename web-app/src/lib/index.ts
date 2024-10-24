@@ -11,6 +11,8 @@ import * as controls from "./controls";
  */
 export function start(globals: AppGlobals): void {
 
+    globals.connect()
+
     const movePlayer = () => {
         globals.updateFrame(
             canvi.place(

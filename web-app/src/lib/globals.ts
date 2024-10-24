@@ -74,7 +74,7 @@ export class AppGlobals {
      * Establish a WebSocket connection.
      */
     connect() {
-        this._socket = io("ws://localhost:3000/", {
+        this._socket = io("ws://localhost:8008/", {
             reconnectionDelayMax: 10000,
         });
     }
