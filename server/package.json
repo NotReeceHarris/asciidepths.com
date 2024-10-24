@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "build": "npx tsc",
+    "build": "tsc",
+    "build:digitalocean": "npm install --production=false && npm run build && npm ci",
     "start": "node dist/index.js",
     "dev": "nodemon --watch \"src/**/*.ts\" --exec \"ts-node\" src/index.ts"
   },
