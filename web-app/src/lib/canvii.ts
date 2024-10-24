@@ -33,6 +33,11 @@ export function clearScreen(ctx: CanvasRenderingContext2D): void {
  * @returns {string[][]} - The new frame with the text element placed on it.
  */
 export function place(frame: string[][], text: string | string[], X: number, Y: number, center: boolean = false): string[][] {
+    
+    if (!frame) {
+        return [[]];
+    }
+    
     // Ensure text is a string
     if (Array.isArray(text)) text = text[0];
 

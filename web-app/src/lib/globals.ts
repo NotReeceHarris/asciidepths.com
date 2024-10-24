@@ -1,6 +1,6 @@
 import { io, Socket } from "socket.io-client";
 import * as menus from "$lib/frames";
-import * as canvi from "$lib/canvi";
+import * as canvii from "$lib/canvii";
 
 /**
  * Class representing the global application state and functionality.
@@ -8,19 +8,28 @@ import * as canvi from "$lib/canvi";
 export class AppGlobals {
 
     /** @type {Socket | undefined} The WebSocket connection. */
-    socket: Socket | undefined;
+    private _socket: Socket | undefined;
 
     /** @type {HTMLCanvasElement} The canvas element. */
-    canvas: HTMLCanvasElement;
+    readonly canvas: HTMLCanvasElement;
 
     /** @type {CanvasRenderingContext2D} The 2D rendering context for the canvas. */
-    ctx: CanvasRenderingContext2D;
+    private _ctx: CanvasRenderingContext2D;
 
     /** @type {string[][]} The current frame to be rendered on the canvas. */
-    frame: string[][];
+    private _frame: string[][];
 
     /** @type {ReturnType<typeof setInterval> | undefined} The interval timer for updating the canvas. */
-    clock: ReturnType<typeof setInterval> | undefined;
+    private _clock: ReturnType<typeof setInterval> | undefined;
+
+    /** @type {number} The frames per second for updating the canvas. */
+    readonly fps: number;
+
+    /** @type {number} The x-coordinate of the current player pos. */
+    private _x: number;
+
+    /** @type {number} The y-coordinate of the current player pos. */
+    private _y: number;
 
     /**
      * Create an instance of AppGlobals.
@@ -28,32 +37,36 @@ export class AppGlobals {
      * @throws Will throw an error if the 2D context is not supported.
      */
     constructor(canvas: HTMLCanvasElement) {
-        this.frame = menus.landing;
+        this._frame = menus.blank;
 
         this.canvas = canvas;
         this.canvas.width = 2550;
         this.canvas.height = 1275;
+        this.fps = 7;
+
+        this._x = 1;
+        this._y = 1;
 
         const ctx = canvas.getContext("2d");
         if (!ctx) throw new Error("2d context not supported");
-        this.ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
+        this._ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
     }
 
     /**
      * Start the interval timer to update the canvas at a fixed rate.
      */
     startClock() {
-        this.clock = setInterval(() => {
-            canvi.update(this.ctx, this.frame);
-        }, 1000 / 7);
+        this._clock = setInterval(() => {
+            canvii.update(this._ctx, this._frame);
+        }, 1000 / this.fps);
     }
 
     /**
      * Stop the interval timer for updating the canvas.
      */
     stopClock() {
-        if (this.clock) {
-            clearInterval(this.clock);
+        if (this._clock) {
+            clearInterval(this._clock);
         }
     }
 
@@ -61,7 +74,7 @@ export class AppGlobals {
      * Establish a WebSocket connection.
      */
     connect() {
-        this.socket = io("ws://localhost:3000/", {
+        this._socket = io("ws://localhost:3000/", {
             reconnectionDelayMax: 10000,
         });
     }
@@ -70,8 +83,8 @@ export class AppGlobals {
      * Disconnect the WebSocket connection.
      */
     disconnect() {
-        if (this.socket) {
-            this.socket.disconnect();
+        if (this._socket) {
+            this._socket.disconnect();
         }
     }
 
@@ -80,6 +93,44 @@ export class AppGlobals {
      * @param {string[][]} frame - The new frame to be rendered.
      */
     updateFrame(frame: string[][]) {
-        this.frame = frame;
+        this._frame = frame;
+    }
+
+    /**
+     * Get the x-coordinate of the current player position.
+     * @param {number} The x-coordinate of the current player position.
+     */
+    set x(x: number) {
+
+        console.log(x);
+
+        if (x < 0 || x > 166) {
+            return;
+        }
+
+        this._x = x;
+    }
+
+    /**
+     * Set the y-coordinate of the current player position.
+     * @param {number} The y-coordinate of the current player position.
+     */
+    set y(y: number) {
+
+        console.log(y);
+
+        if (y < 0 || y > 48) {
+            return;
+        }
+
+        this._y = y;
+    }
+
+    get x() {
+        return this._x;
+    }
+
+    get y() {
+        return this._y;
     }
 }

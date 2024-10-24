@@ -1,7 +1,8 @@
 import { AppGlobals } from "./globals";
-import * as canvi from "./canvi";
+import * as canvi from "./canvii";
 import * as menus from "./frames";
 import * as ascii from "./ascii";
+import * as controls from "./controls";
 
 /**
  * Starts the application by initializing the clock and updating the frame at a fixed interval.
@@ -10,21 +11,71 @@ import * as ascii from "./ascii";
  */
 export function start(globals: AppGlobals): void {
 
-    globals.startClock();
+    controls.register('w', () => {
+        globals.y -= 1;
 
-    let counter = 0;
-    setInterval(() => {
         globals.updateFrame(
             canvi.place(
-                menus.landing,
-                ascii.character.walkingRight[
-                    counter % ascii.character.walkingLeft.length
-                ],
-                counter % 20,
-                0,
+                menus.blank,
+                ascii.character.walkingRight[0],
+                globals.x,
+                globals.y,
                 false,
             )
         );
-        counter++;
-    }, 1000 / 7);
+    });
+
+    controls.register('a', () => {
+        globals.x -= 1;
+
+        globals.updateFrame(
+            canvi.place(
+                menus.blank,
+                ascii.character.walkingRight[0],
+                globals.x,
+                globals.y,
+                false,
+            )
+        );
+    });
+
+    controls.register('s', () => {
+        globals.y += 1;
+
+        globals.updateFrame(
+            canvi.place(
+                menus.blank,
+                ascii.character.walkingRight[0],
+                globals.x,
+                globals.y,
+                false,
+            )
+        );
+    });
+
+    controls.register('d', () => {
+        globals.x += 1;
+
+        globals.updateFrame(
+            canvi.place(
+                menus.blank,
+                ascii.character.walkingRight[0],
+                globals.x,
+                globals.y,
+                false,
+            )
+        );
+    });
+
+    globals.updateFrame(
+        canvi.place(
+            menus.blank,
+            ascii.character.walkingRight[0],
+            globals.x,
+            globals.y,
+            false,
+        )
+    );
+
+    globals.startClock();
 }

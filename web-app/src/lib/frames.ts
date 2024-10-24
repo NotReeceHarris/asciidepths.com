@@ -6,7 +6,6 @@
  * @returns {string[][]} - The 2D array representation of the frame.
  */
 function convert2frame(string: String): string[][] {
-
     if (string.trim().replaceAll("\n",'').length !== 169 * 51) {
         new Error(`The frame is not the correct size. (provided ${string.trim().split('\n')[0].length}x${string.trim().split('\n').length}, expected 169x51)`);
         return Array(51).fill(`INCORRECT FRAME SIZE (provided ${string.trim().split('\n')[0].length}x${string.trim().split('\n').length}, expected 169x51)`.repeat(3).split(''));
@@ -15,7 +14,7 @@ function convert2frame(string: String): string[][] {
     return string.trim().split("\n").map(row => row.split(""));
 }
 
-export const landing = convert2frame(`
+export const blank = convert2frame(`
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
