@@ -11,60 +11,36 @@ import * as controls from "./controls";
  */
 export function start(globals: AppGlobals): void {
 
-    controls.register('w', () => {
+    const movePlayer = () => {
+        globals.updateFrame(
+            canvi.place(
+                menus.blank,
+                ascii.character.walkingRight[0],
+                globals.x,
+                globals.y,
+                false,
+            )
+        );
+    }
+
+    controls.register(['w', 'ArrowUp'], () => {
         globals.y -= 1;
-
-        globals.updateFrame(
-            canvi.place(
-                menus.blank,
-                ascii.character.walkingRight[0],
-                globals.x,
-                globals.y,
-                false,
-            )
-        );
+        movePlayer();
     });
 
-    controls.register('a', () => {
+    controls.register(['a', 'ArrowLeft'], () => {
         globals.x -= 1;
-
-        globals.updateFrame(
-            canvi.place(
-                menus.blank,
-                ascii.character.walkingRight[0],
-                globals.x,
-                globals.y,
-                false,
-            )
-        );
+        movePlayer();
     });
 
-    controls.register('s', () => {
+    controls.register(['s', 'ArrowDown'], () => {
         globals.y += 1;
-
-        globals.updateFrame(
-            canvi.place(
-                menus.blank,
-                ascii.character.walkingRight[0],
-                globals.x,
-                globals.y,
-                false,
-            )
-        );
+        movePlayer();
     });
 
-    controls.register('d', () => {
+    controls.register(['d', 'ArrowRight'], () => {
         globals.x += 1;
-
-        globals.updateFrame(
-            canvi.place(
-                menus.blank,
-                ascii.character.walkingRight[0],
-                globals.x,
-                globals.y,
-                false,
-            )
-        );
+        movePlayer();
     });
 
     globals.updateFrame(

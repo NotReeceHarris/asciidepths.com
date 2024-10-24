@@ -102,8 +102,6 @@ export class AppGlobals {
      */
     set x(x: number) {
 
-        console.log(x);
-
         if (x < 0 || x > 166) {
             return;
         }
@@ -126,10 +124,18 @@ export class AppGlobals {
         this._y = y;
     }
 
+    /**
+     * Get the x-coordinate of the current player position.
+     * @returns {number} The x-coordinate of the current player position.
+     */
     get x() {
         return this._x;
     }
 
+    /**
+     * Get the y-coordinate of the current player position.
+     * @returns {number} The y-coordinate of the current player position.
+     */
     get y() {
         return this._y;
     }
