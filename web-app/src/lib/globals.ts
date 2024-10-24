@@ -74,7 +74,7 @@ export class AppGlobals {
      * Establish a WebSocket connection.
      */
     connect() {
-        this._socket = io("ws://stingray-app-2cl7i.ondigitalocean.app", {
+        this._socket = io("wss://dev-wss.asciidepths.com", {
             reconnectionDelayMax: 10000,
         });
     }
