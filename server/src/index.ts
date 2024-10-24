@@ -1,7 +1,13 @@
 import { createServer } from "http";
 import { Server, Socket } from "socket.io";
 
-const httpServer = createServer();
+const httpServer = createServer(
+  (req, res) => {
+    res.writeHead(200, { "Content-Type": "text/plain" });
+    res.end("https://github.com/NotReeceHarris/asciidepths.com");
+  }
+);
+
 const io = new Server(httpServer, {
   cors: {
     origin: "*",
@@ -19,6 +25,6 @@ io.on("connection", (socket: Socket) => {
 
 });
 
-httpServer.listen(8008, () => {
-  console.log('Server is listening on port 8008');
+httpServer.listen(8080, () => {
+  console.log('Server is listening on port 8080');
 });

@@ -13,9 +13,9 @@ export function register(key: string | string[], callback: Function): void {
     controls[key] = callback;
 }
 
-document.addEventListener('keydown', (event: KeyboardEvent) => {
+/* document.addEventListener('keydown', (event: KeyboardEvent) => {
     const key = event.key;
     if (controls[key]) {
         controls[key]();
     }
-});
+}); */
