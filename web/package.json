@@ -1,4 +1,5 @@
 {
+  "version": "0.0.1-alpha1",
   "scripts": {
     "dev": "concurrently --names \"BUILD,SERVE\"  \"webpack --mode development --watch\" \"npm run serve\"",
     "serve": "live-server --watch=\"./dist,index.html\" --no-browser",

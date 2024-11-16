@@ -20,16 +20,4 @@ export default async function app(context: CanvasRenderingContext2D, clock: Cloc
 
     }, 0);
 
-    clock.addProcess('test', async (ctx, memory) => {
-
-        if (memory.count === undefined) {
-            memory.count = 0;
-        };
-
-        ctx.fillStyle = Colours['battleship-grey'];
-        writeText(ctx, `test ${memory.count}`, 100, 100, null, false, '50px Inconsolata');
-        memory.count++;
-
-    }, 1);
-
 }

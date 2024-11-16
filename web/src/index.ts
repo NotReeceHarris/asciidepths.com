@@ -1,6 +1,5 @@
 import app from './app';
 import clock from './clock';
-import { writeText } from "./utils/text";
 
 // Import the font files
 import Alucrads from './assets/Alucrads.ttf';
@@ -37,6 +36,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Page has loaded, run the app.
     app(context, clockInstance);
     clockInstance.start();
+
+    // Fullscreen Toggle Logic
+    const fullscreenToggleButton = document.querySelector('#fullscreen-toggle') as HTMLButtonElement;
+    const maximiseIcon = fullscreenToggleButton.querySelector('#max') as HTMLElement;
+    const minimiseIcon = fullscreenToggleButton.querySelector('#min') as HTMLElement;
+
+    fullscreenToggleButton.addEventListener('click', () => {
+        if (document.fullscreenElement) {
+            document.exitFullscreen();
+            maximiseIcon.classList.remove('hidden');
+            minimiseIcon.classList.add('hidden');
+        } else {
+            document.documentElement.requestFullscreen();
+            maximiseIcon.classList.add('hidden');
+            minimiseIcon.classList.remove('hidden');
+        }
+    });
+
+    
 });
 
 import './assets/styles.css';
