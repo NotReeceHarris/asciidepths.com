@@ -39,7 +39,7 @@ jobs:
           mv web/dist docs/dist
           mv web/index.html docs/index.html
           mv web/favicon.ico docs/favicon.ico
-          echo "asccidepths.com" > docs/CNAME
+          echo "asciidepths.com" > docs/CNAME
 
       # Add and commit the changes in the docs folder
       - name: Commit changes
