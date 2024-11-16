@@ -39,6 +39,7 @@ jobs:
           mv web/dist docs/dist
           mv web/index.html docs/index.html
           mv web/favicon.ico docs/favicon.ico
+          echo "asccidepths.com" > docs/CNAME
 
       # Add and commit the changes in the docs folder
       - name: Commit changes
@@ -49,18 +50,21 @@ jobs:
           git commit -m "Deploy updated build to docs"
         continue-on-error: true # Prevents workflow failure if there are no changes to commit
 
-      # Overwrite the development branch (delete if exists)
-      - name: Overwrite development branch
+      # Wipe and push to the development branch
+      - name: Wipe and push to development branch
         run: |
           git fetch origin
 
-          # Delete the remote development branch if it exists
-          git push origin --delete development
+          # Switch to the main branch first
+          git checkout main
 
-          # Create and switch to the development branch from the current commit
+          # Delete the local development branch if it exists
+          git branch -D development || echo "No local development branch to delete"
+
+          # Create a fresh development branch from the current state of main
           git checkout -b development
 
-          # Push the changes to the development branch (this will recreate it on the remote)
+          # Push the new development branch to the remote, force pushing to overwrite it
           git push --force origin development
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Auto-managed token
