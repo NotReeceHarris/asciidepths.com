@@ -49,18 +49,20 @@ jobs:
           git commit -m "Deploy updated build to docs"
         continue-on-error: true # Prevents workflow failure if there are no changes to commit
 
-      # Create the development branch if it doesn't exist and push the changes
+      # Handle branch creation and pushing to the 'development' branch
       - name: Push changes to development branch
         run: |
           git fetch origin
 
           # Create the development branch if it doesn't exist yet
-          if ! git rev-parse --verify origin/development; then
-            git checkout --orphan development
-          else
+          if git rev-parse --verify origin/development; then
             git checkout development
+          else
+            # Create and switch to development branch from the current commit
+            git checkout -b development
           fi
 
-          git push origin HEAD:development
+          # Now, push the changes
+          git push origin development
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Auto-managed token
