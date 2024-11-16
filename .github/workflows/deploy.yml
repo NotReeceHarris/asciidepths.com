@@ -49,20 +49,18 @@ jobs:
           git commit -m "Deploy updated build to docs"
         continue-on-error: true # Prevents workflow failure if there are no changes to commit
 
-      # Handle branch creation and pushing to the 'development' branch
-      - name: Push changes to development branch
+      # Overwrite the development branch (delete if exists)
+      - name: Overwrite development branch
         run: |
           git fetch origin
 
-          # Create the development branch if it doesn't exist yet
-          if git rev-parse --verify origin/development; then
-            git checkout development
-          else
-            # Create and switch to development branch from the current commit
-            git checkout -b development
-          fi
+          # Delete the remote development branch if it exists
+          git push origin --delete development
 
-          # Now, push the changes
-          git push origin development
+          # Create and switch to the development branch from the current commit
+          git checkout -b development
+
+          # Push the changes to the development branch (this will recreate it on the remote)
+          git push --force origin development
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Auto-managed token
