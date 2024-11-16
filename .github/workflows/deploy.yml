@@ -36,7 +36,7 @@ jobs:
       - name: Move build to docs
         run: |
           mkdir docs
-          mv web/build docs/dist
+          mv web/dist docs/dist
           mv web/index.html docs/index.html
           mv web/favicon.ico docs/favicon.ico
 
