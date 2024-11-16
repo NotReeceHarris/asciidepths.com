@@ -3,13 +3,17 @@ export function writeText(
     text: string,
     x: number,
     y: number,
-    maxWidth: number,
+    maxWidth: number | null,
     center: boolean,
     font: string
 ) {
     const words = text.split(' ');
     let line = '';
     const lineHeight = 20; // You can adjust this as needed
+
+    if (maxWidth === null) {
+        maxWidth = ctx.canvas.width;
+    }
 
     // If center is true, calculate the total text height and adjust `y` for vertical centering
     if (center) {

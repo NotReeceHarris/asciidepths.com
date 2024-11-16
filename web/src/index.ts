@@ -1,5 +1,6 @@
 import app from './app';
 import clock from './clock';
+import { writeText } from "./utils/text";
 
 // Import the font files
 import Alucrads from './assets/Alucrads.ttf';
@@ -8,7 +9,7 @@ import Inconsolata from './assets/Inconsolata.ttf';
 // Set the canvas dimensions and resolution
 const width = 1000;
 const height = 500;
-const resolution = 2;
+const resolution = 4;
 
 // Create the font face, canvas and context
 const canvas = document.createElement('canvas') as HTMLCanvasElement;
