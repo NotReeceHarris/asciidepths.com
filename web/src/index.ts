@@ -1,5 +1,5 @@
 import app from './app';
-import clock from './clock';
+import clock from './utils/clock';
 
 // Import the font files
 import Alucrads from './assets/Alucrads.ttf';
@@ -69,17 +69,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     const serverVersion = localStorage.getItem('server-version');
 
     const versionContainer = document.createElement('div');
-    versionContainer.classList.add('absolute', 'bottom-0', 'left-0', 'text-xs', 'text-battleship-grey', 'p-2', 'flex', 'place-items-center', 'w-fit');
+    versionContainer.classList.add('absolute', 'bottom-0', 'left-0', 'text-xs', 'text-battleship-grey', 'p-2', 'flex', 'flex-col', 'w-fit');
 
     if (webVersion) {
         const versionElement = document.createElement('p');
-        versionElement.textContent = 'web: ' + webVersion;
+        versionElement.innerHTML = 'web:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + webVersion;
         versionContainer.appendChild(versionElement);
     }
 
     if (serverVersion) {
         const versionElement = document.createElement('p');
-        versionElement.textContent = 'server: ' + serverVersion;
+        versionElement.innerHTML = 'server:&nbsp;&nbsp;' + serverVersion;
         versionContainer.appendChild(versionElement);
     }
 

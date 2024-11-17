@@ -17,7 +17,7 @@ export default class Clock {
         this.running = false;
 
         // Create the Web Worker
-        this.worker = new Worker(new URL('./utils/worker.ts', import.meta.url), { type: 'module' });
+        this.worker = new Worker(new URL('../workers/clock.worker.ts', import.meta.url), { type: 'module' });
 
         // Listen for messages from the worker (for example, to indicate the clock should be running)
         this.worker.onmessage = (event) => {

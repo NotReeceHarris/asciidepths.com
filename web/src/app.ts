@@ -1,7 +1,7 @@
 import { writeText, clearScreen } from "./utils/tools";
 import Colours from "./constants/colours.json";
 import WebSocket from "./utils/websocket";
-import type Clock from "./clock";
+import type Clock from "./utils/clock";
 
 export default async function app(context: CanvasRenderingContext2D, clock: Clock) {
 
@@ -24,7 +24,7 @@ export default async function app(context: CanvasRenderingContext2D, clock: Cloc
     await new Promise((resolve) => setTimeout(resolve, 2000));
     const ws = new WebSocket('ws://localhost:8008');
 
-    ws.socket.addEventListener("open", async (event) => {
+    ws.addEventListener("open", async (event) => {
         clock.removeProcess('landing-loading');
         clock.stop();
 
