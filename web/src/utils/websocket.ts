@@ -1,61 +1,82 @@
-export default class CustomWebSocket {
-    private worker: Worker;
-    private url: string;
-    private eventListeners: Map<string, EventListener>;
+function isValidJSON(input: string): boolean {
+    try {
+        JSON.parse(input);
+        return true;
+    } catch (error) {
+        return false;
+    }
+}
+
+export default class WebSocketClient {
+    url: string;
+    socket: WebSocket;
+    private _heartbeatInterval: NodeJS.Timeout | undefined;
+    eventListeners: Map<string, EventListener>;
 
     constructor(url: string) {
         this.url = url;
-        this.worker = new Worker(new URL('../workers/websocket.worker.ts', import.meta.url));
+        this.socket = new WebSocket(this.url);
         this.eventListeners = new Map();
 
-        // Connect the WebSocket in the worker
-        this.worker.postMessage({ type: 'connect', url });
+        // Bind `this` to the event listener methods
+        this.eventListenersOpen = this.eventListenersOpen.bind(this);
+        this.eventListenersMessage = this.eventListenersMessage.bind(this);
+        this.eventListenersClose = this.eventListenersClose.bind(this);
 
-        // Handle messages from the worker
-        this.worker.onmessage = (e: MessageEvent) => {
-            const { type, event, data } = e.data;
+        // Add event listeners
+        this.socket.addEventListener('open', this.eventListenersOpen);
+        this.socket.addEventListener('message', this.eventListenersMessage);
+        this.socket.addEventListener('close', this.eventListenersClose);
+    }
 
-            if (type === 'message') {
-                console.log(JSON.parse(data)); // Process incoming messages
-            } else if (type === 'close') {
-                console.log('Connection closed. Reconnecting...');
-                this.reconnect();
-            } else if (type === 'event' && event && this.eventListeners.has(event)) {
-                const listener = this.eventListeners.get(event)!;
-                listener(data); // Call the listener with the event data
-            }
-        };
+    private eventListenersMessage(event: MessageEvent) {
+
+        if (event.data === 'pong') return;
+
+        // Parse and validate the incoming message
+        if (!isValidJSON(event.data)) {
+            console.error('Invalid JSON:', event.data);
+            return;
+        }
+
+        console.log(JSON.parse(event.data));
+    }
+
+    private eventListenersOpen() {
+        console.log('Connection opened.');
+        this._heartbeatInterval = setInterval(() => this.socket.send('ping'), 30000);
+    }
+
+    private eventListenersClose() {
+        this.reconnect();
+        if (this._heartbeatInterval) clearInterval(this._heartbeatInterval);
     }
 
     addEventListener(event: string, callback: EventListener) {
         this.eventListeners.set(event, callback);
-        this.worker.postMessage({ type: 'addEventListener', event });
+        this.socket.addEventListener(event, callback);
     }
 
-    removeEventListener(event: string) {
-        if (this.eventListeners.has(event)) {
-            this.worker.postMessage({ type: 'removeEventListener', event });
-            this.eventListeners.delete(event);
-        }
-    }
-
-    send(message: string) {
-        this.worker.postMessage({ type: 'send', callback: message });
+    removeEventListener(name: string) {
+        const event = this.eventListeners.get(name);
+        if (event) this.socket.removeEventListener(name, event);
+        this.eventListeners.delete(name)
     }
 
     reconnect() {
+        console.log('Connection closed. Polling reconnection...');
         setTimeout(() => {
-            console.log('Reconnecting...');
-            this.worker.postMessage({ type: 'connect', url: this.url });
+            this.socket = new WebSocket(this.url);
 
-            // Reattach custom event listeners
-            this.eventListeners.forEach((_, event) => {
-                this.worker.postMessage({ type: 'addEventListener', event });
+            // Reattach event listeners after reconnecting
+            this.socket.addEventListener('message', this.eventListenersMessage);
+            this.socket.addEventListener('close', this.eventListenersClose);
+            this.socket.addEventListener('open', this.eventListenersOpen);
+
+            // Reattach custom event listeners after reconnecting
+            this.eventListeners.forEach((callback, event) => {
+                this.socket.addEventListener(event, callback);
             });
         }, 1000);
-    }
-
-    close() {
-        this.worker.postMessage({ type: 'close' });
     }
 }

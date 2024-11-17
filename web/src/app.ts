@@ -1,54 +1,105 @@
-import { writeText, clearScreen } from "./utils/tools";
+import { writeText } from "./utils/tools";
 import Colours from "./constants/colours.json";
 import WebSocket from "./utils/websocket";
+import { email, password, login, div, error } from "./utils/html";
+
 import type Clock from "./utils/clock";
+
+let authToken: string | null = null;
 
 export default async function app(context: CanvasRenderingContext2D, clock: Clock) {
 
     const centerX = context.canvas.width / 2;
     const centerY = context.canvas.height / 2;
 
-    clock.addProcess('landing-loading', (ctx, memory) => {
-
-        if (memory.dots === undefined) {
-            memory.dots = 0;
-        };
+    // Loading screen
+    clock.addProcess('loading', (ctx, memory) => {
+        if (memory.dots === undefined || memory.dots === 3) {memory.dots = 0} else memory.dots++;
 
         ctx.fillStyle = Colours['battleship-grey'];
-        writeText(ctx, 'Ascii Depths', centerX, centerY, null, true, '300px Alucrads');
+        writeText(ctx, 'Ascii Depths', centerX + 20, centerY, null, true, '300px Alucrads');
         writeText(ctx, `Connecting to server${'.'.repeat(memory.dots)}`, centerX - 550, centerY + 60, null, false, '40px Inconsolata');
-        if (memory.dots === 4) {memory.dots = 0} else memory.dots++;
-
     }, 0);
 
-    await new Promise((resolve) => setTimeout(resolve, 2000));
     const ws = new WebSocket('ws://localhost:8008');
 
-    ws.addEventListener("open", async (event) => {
-        clock.removeProcess('landing-loading');
-        clock.stop();
+    const sendAuth = () => {
+        ws.socket.send(JSON.stringify({ 
+            type: 'auth', 
+            email: email.value, 
+            password: password.value 
+        }));
+    };
 
-        clearScreen(context);
-        context.fillStyle = Colours['battleship-grey'];
-        writeText(context, 'Ascii Depths', centerX, centerY, null, true, '300px Alucrads');
-        writeText(context, 'Connected!', centerX - 550, centerY + 60, null, false, '40px Inconsolata');
+    // Close event
+    ws.addEventListener("close", async () => {
 
-        await new Promise((resolve) => setTimeout(resolve, 2000));
+        // Remove input fields
+        email.remove();
+        password.remove();
+        login.remove();
+        error.remove();
 
-        clock.addProcess('landing-loading', (ctx, memory) => {
-
-            if (memory.dots === undefined) {
-                memory.dots = 0;
-            };
+        // Loading screen
+        clock.start();
+        clock.addProcess('loading', (ctx, memory) => {
+            if (memory.dots === undefined || memory.dots === 3) {memory.dots = 0} else memory.dots++;
     
             ctx.fillStyle = Colours['battleship-grey'];
-            writeText(ctx, 'Ascii Depths', centerX, centerY, null, true, '300px Alucrads');
-            writeText(ctx, `Authenticating ${'.'.repeat(memory.dots)}`, centerX - 550, centerY + 60, null, false, '40px Inconsolata');
-            if (memory.dots === 4) {memory.dots = 0} else memory.dots++;
-    
+            writeText(ctx, 'Ascii Depths', centerX + 20, centerY, null, true, '300px Alucrads');
+            writeText(ctx, `Connection lost, Reconnecting${'.'.repeat(memory.dots)}`, centerX - 550, centerY + 60, null, false, '40px Inconsolata');
         }, 0);
+    });
 
-        clock.start();
+    // Open event
+    ws.addEventListener("open", async (event) => {
+        clock.stop();
+        clock.removeProcess('loading');
+
+        context.fillStyle = Colours['battleship-grey'];
+        writeText(context, 'Ascii Depths', centerX + 20, centerY, null, true, '300px Alucrads');
+
+        // Create input field
+        document.body.appendChild(email);
+        document.body.appendChild(password);
+        document.body.appendChild(login);
+
+        login.removeEventListener('click', sendAuth);
+        login.addEventListener('click', sendAuth);
+
+        ws.addEventListener('message', (event: any) => {
+            
+            try {
+                JSON.parse(event.data);
+            } catch (error) {
+                return;
+            }
+
+            const json = JSON.parse(event.data);
+
+            if (!json.type) return;
+            if (json.type !== 'auth') return;
+            if (json.success === false) return document.body.appendChild(error);
+
+            // Remove input fields
+            email.remove();
+            password.remove();
+            login.remove();
+            error.remove();
+
+            authToken = json.authToken;
+
+            // Loading screen
+            clock.start();
+            clock.addProcess('loading', (ctx, memory) => {
+                if (memory.dots === undefined || memory.dots === 3) {memory.dots = 0} else memory.dots++;
+        
+                ctx.fillStyle = Colours['battleship-grey'];
+                writeText(ctx, 'Ascii Depths', centerX + 20, centerY, null, true, '300px Alucrads');
+                writeText(ctx, `Logged in, loading${'.'.repeat(memory.dots)}`, centerX - 550, centerY + 60, null, false, '40px Inconsolata');
+            }, 0);
+
+        });
 
     });
 

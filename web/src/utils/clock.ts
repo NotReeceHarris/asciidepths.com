@@ -91,6 +91,7 @@ export default class Clock {
 
     public stop(): void {
         // Stop the worker clock by sending a message to the worker
+        this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
         this.running = false;
         this.worker.postMessage('stop');
     }
