@@ -57,16 +57,33 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Get the version from the development branch of the repository and display it on the page
     fetch('https://raw.githubusercontent.com/NotReeceHarris/asciidepths.com/refs/heads/development/web/package.json')
     .then(response => response.json())
-    .then(data => {if (data.version) localStorage.setItem('version', data.version);})
+    .then(data => {if (data.version) localStorage.setItem('web-version', data.version);})
     .catch(error => console.error('Failed to fetch package.json', error));
 
-    const version = localStorage.getItem('version');
-    if (version) {
-        const versionElement = document.createElement('span');
-        versionElement.textContent = version;
-        versionElement.classList.add('absolute', 'bottom-0', 'left-0', 'text-xs', 'text-battleship-grey', 'p-2');
-        document.body.appendChild(versionElement);
+    fetch('https://raw.githubusercontent.com/NotReeceHarris/asciidepths.com/refs/heads/development/server/package.json')
+    .then(response => response.json())
+    .then(data => {if (data.version) localStorage.setItem('server-version', data.version);})
+    .catch(error => console.error('Failed to fetch package.json', error));
+
+    const webVersion = localStorage.getItem('web-version');
+    const serverVersion = localStorage.getItem('server-version');
+
+    const versionContainer = document.createElement('div');
+    versionContainer.classList.add('absolute', 'bottom-0', 'left-0', 'text-xs', 'text-battleship-grey', 'p-2', 'flex', 'place-items-center', 'w-fit');
+
+    if (webVersion) {
+        const versionElement = document.createElement('p');
+        versionElement.textContent = 'web: ' + webVersion;
+        versionContainer.appendChild(versionElement);
     }
+
+    if (serverVersion) {
+        const versionElement = document.createElement('p');
+        versionElement.textContent = 'server: ' + serverVersion;
+        versionContainer.appendChild(versionElement);
+    }
+
+    document.body.appendChild(versionContainer);
 });
 
 import './assets/styles.css';

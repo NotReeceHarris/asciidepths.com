@@ -76,3 +76,7 @@ export function writeText(
         ctx.fillText(line, x, currentY); // Default position
     }
 }
+
+export function clearScreen(ctx: CanvasRenderingContext2D) {
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+}
