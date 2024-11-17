@@ -1,0 +1,1 @@
+(()=>{"use strict";(()=>{let e,s=!1;self.onmessage=t=>{"start"!==t.data||s?"stop"===t.data&&(console.log("Clock stopped"),s=!1,clearInterval(e)):(s=!0,console.log("Game clock started."),postMessage("tick"),e=setInterval((()=>{s&&postMessage("tick")}),500))}})()})();
