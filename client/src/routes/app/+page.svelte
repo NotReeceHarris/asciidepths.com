@@ -27,28 +27,30 @@
 	} = $state({});
 
 	function on_key_down(event: KeyboardEvent) {
-		if (event.key === 'w') {
+		if (!authenticated || !connected) return;
+
+		if (['w', 'ArrowUp'].includes(event.key)) {
 			posy -= 1;
 			socket.emit('move', { x: 0, y: -1 });
-			draw(canvas, map, users_in_location, posx, posy);
+			return draw(canvas, map, users_in_location, posx, posy);
 		}
 
-		if (event.key === 's') {
+		if (['s', 'ArrowDown'].includes(event.key)) {
 			posy += 1;
 			socket.emit('move', { x: 0, y: 1 });
-			draw(canvas, map, users_in_location, posx, posy);
+			return draw(canvas, map, users_in_location, posx, posy);
 		}
 
-		if (event.key === 'a') {
+		if (['a', 'ArrowLeft'].includes(event.key)) {
 			posx -= 1;
 			socket.emit('move', { x: -1, y: 0 });
-			draw(canvas, map, users_in_location, posx, posy);
+			return draw(canvas, map, users_in_location, posx, posy);
 		}
 
-		if (event.key === 'd') {
+		if (['d', 'ArrowRight'].includes(event.key)) {
 			posx += 1;
 			socket.emit('move', { x: 1, y: 0 });
-			draw(canvas, map, users_in_location, posx, posy);
+			return draw(canvas, map, users_in_location, posx, posy);
 		}
     }
 
@@ -129,7 +131,8 @@
 </script>  
 
 <svelte:window
-    on:keypress={on_key_down}
+    on:keydown={on_key_down}
+	
 />
 
 {#if connected && authenticated}
