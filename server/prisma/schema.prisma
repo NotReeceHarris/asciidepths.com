@@ -10,6 +10,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+<<<<<<< HEAD
 
 model User {
   id            Int       @id @default(autoincrement())
@@ -41,3 +42,12 @@ model Location {
 
   users     User[]
 }
+=======
+model User {
+  id       Int     @id @default(autoincrement())
+  email    String  @unique
+  password String
+  username String?
+  position String?
+}
+>>>>>>> 9a9f08a56bc33fa58cc4d8b98a81568e4b69130c

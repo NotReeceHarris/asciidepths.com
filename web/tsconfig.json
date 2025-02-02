@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "lib": ["dom", "esnext", "webworker"],
+        "target": "es6",
+        "module": "esnext",
+        "strict": true,
+        "esModuleInterop": true,
+        "outDir": "./dist",
+        "sourceMap": true,
+        "resolveJsonModule": true,
+        "moduleResolution": "node"
+    },
+    "include": ["src/**/*", "../declarations.d.ts"],
+    "exclude": ["node_modules"]
+}
