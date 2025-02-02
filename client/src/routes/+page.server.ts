@@ -6,6 +6,8 @@ export const load: PageServerLoad = async ({ cookies }) => {
 
     if (await validateSession(cookies)) {
         redirect(307, '/app');
+    } else {
+        redirect(307, '/auth');
     }
 
 };
