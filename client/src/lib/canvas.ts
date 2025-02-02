@@ -40,8 +40,8 @@ export function draw(canvas: HTMLCanvasElement, map: {background: string, highli
     ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
     drawTile(ctx, map.highlight, 0, 0);
 
-    ctx.fillStyle = 'rgba(255, 0, 0, 0.1)';
-    drawTile(ctx, map.floor, 0, 0);
+    /* ctx.fillStyle = 'rgba(255, 0, 0, 0.1)';
+    drawTile(ctx, map.floor, 0, 0); */
 
     const player_char = '_';
     const other_player_char = '_';

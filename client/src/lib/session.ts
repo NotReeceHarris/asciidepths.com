@@ -2,11 +2,9 @@ import { PUBLIC_SERVER_ADDRESS } from '$env/static/public';
 import type { Cookies } from '@sveltejs/kit';
 
 export async function validateSession(cookies: Cookies): Promise<boolean> {
-    const sessionCookie = cookies.get('session');
 
-    if (!sessionCookie) {
-        return false;
-    }
+    const sessionCookie = cookies.get('session');
+    if (!sessionCookie) return false;
 
     const [username, session] = sessionCookie.split(':');
 
@@ -20,10 +18,7 @@ export async function validateSession(cookies: Cookies): Promise<boolean> {
         });
 
         const data = await response.json();
-
-        if (data.success) {
-            return true;
-        }
+        if (data.success) return true;
 
         // If validation fails, delete the session cookie
         cookies.delete('session', { path: '/' });
