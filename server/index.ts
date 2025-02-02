@@ -179,6 +179,7 @@ function getMap(id: string, name: string): {
     background: string,
     highlight: string,
     floor: string,
+    foreground: string,
 } {
     if (mapCache.has(id)) {
         return mapCache.get(id)
@@ -187,9 +188,10 @@ function getMap(id: string, name: string): {
     const background = fs.readFileSync(`./maps/${name}/background.txt`, 'utf8');
     const highlight = fs.readFileSync(`./maps/${name}/highlight.txt`, 'utf8');
     const floor = fs.readFileSync(`./maps/${name}/floor.txt`, 'utf8');
+    const foreground = fs.readFileSync(`./maps/${name}/foreground.txt`, 'utf8');
 
-    mapCache.set(id, { background, highlight, floor });
-    return { background, highlight, floor };
+    mapCache.set(id, { background, highlight, floor, foreground });
+    return { background, highlight, floor, foreground };
 }
 
 // Socket.IO connection handling

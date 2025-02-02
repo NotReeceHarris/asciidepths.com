@@ -14,7 +14,7 @@
 
 	let myUsername = $state('');
 	let location = $state(null);
-	let map: {background: string,highlight: string,floor: string,} = $state({background: '',highlight: '',floor: ''});
+	let map: {background: string,highlight: string,floor: string,foreground: string} = $state({background: '',highlight: '',floor: '',foreground: ''});
 
 	let posx = $state(0);
 	let posy = $state(0);

@@ -15,7 +15,7 @@ function drawTile(ctx: CanvasRenderingContext2D, tile: string, X: number, Y: num
     }
 }
 
-export function draw(canvas: HTMLCanvasElement, map: {background: string, highlight: string, floor: string}, players: {[username: string]: {x: number,y: number}}, posx: number, posy: number): void {
+export function draw(canvas: HTMLCanvasElement, map: {background: string, highlight: string, floor: string, foreground: string}, players: {[username: string]: {x: number,y: number}}, posx: number, posy: number): void {
 
     const ctx = canvas.getContext('2d');
     if (!ctx) {
@@ -30,11 +30,14 @@ export function draw(canvas: HTMLCanvasElement, map: {background: string, highli
     ctx.fillStyle = 'black';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
     drawTile(ctx, map.background, 0, 0);
 
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
     drawTile(ctx, map.highlight, 0, 0);
+
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+    drawTile(ctx, map.foreground, 0, 0);
 
     /* ctx.fillStyle = 'rgba(255, 0, 0, 0.1)';
     drawTile(ctx, map.floor, 0, 0); */
