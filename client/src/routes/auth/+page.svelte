@@ -13,7 +13,6 @@
     let remember: boolean = $state(false);
 
     function login() {
-
         errors = [];
         fetch(`${PUBLIC_SERVER_ADDRESS}/auth/login`, {
             method: 'POST',
@@ -56,7 +55,7 @@
         .then(res=>res.json())
         .then((res) => {
             if (res.success) {
-                const session = res.session;
+                const session = `${res.username}:${res.session}`;
                 Cookies.set('session', session, { ...( remember ? {expires: 7} : {} ), path: '/' });
                 goto('/app');
             } else {
@@ -70,84 +69,86 @@
 
 </script>
 
-{#if showing === 'login'}
-    <form class="flex flex-col gap-4 w-fit border p-4 m-4 rounded-md" onsubmit={(e) => {
-        e.preventDefault();
-        login();
-    }}>
+<div class="flex flex-col items-center place-items-center justify-center h-screen">
+    {#if showing === 'login'}
+        <form class="max-w-[500px] flex flex-col gap-4 w-full border p-4 m-4 rounded-md" onsubmit={(e) => {
+            e.preventDefault();
+            login();
+        }}>
 
-        <div class="flex flex-col gap-2">
-            <label for="email">Email address</label>
-            <input bind:value={email} type="email" id="email" name="email" required class="border-b">
-        </div>
+            <div class="flex flex-col gap-2">
+                <label for="email">Email address</label>
+                <input bind:value={email} type="email" id="email" name="email" required class="border-b">
+            </div>
 
-        <div class="flex flex-col gap-2">
-            <label for="password">Password</label>
-            <input bind:value={password} type="password" id="password" name="password" required class="border-b">
-        </div>
+            <div class="flex flex-col gap-2">
+                <label for="password">Password</label>
+                <input bind:value={password} type="password" id="password" name="password" required class="border-b">
+            </div>
 
-        <div class="flex gap-2">
-            <label for="remember">Remember me</label>
-            <input bind:checked={remember} type="checkbox" id="remember" name="remember" class="border-b">
-        </div>
+            <div class="flex gap-2">
+                <label for="remember">Remember me</label>
+                <input bind:checked={remember} type="checkbox" id="remember" name="remember" class="border-b">
+            </div>
 
-        <button class="text-left border rounded-md p-2">
-            Login
-        </button>
+            <button class="text-left border rounded-md p-2">
+                Login
+            </button>
 
-        <button 
-            type="button"
-            class="text-left underline" 
-            onclick={() => {
-                showing = 'register'
-            }}
-        >
-            Create an account
-        </button>
+            <button 
+                type="button"
+                class="text-left underline" 
+                onclick={() => {
+                    showing = 'register'
+                }}
+            >
+                Create an account
+            </button>
 
-    </form>
-{:else}
-    <form class="flex flex-col gap-4 w-fit border p-4 m-4 rounded-md" onsubmit={(e) => {
-        e.preventDefault();
-        register();
-    }}>
+        </form>
+    {:else}
+        <form class="max-w-[500px] flex flex-col gap-4 w-full border p-4 m-4 rounded-md" onsubmit={(e) => {
+            e.preventDefault();
+            register();
+        }}>
 
-        <div class="flex flex-col gap-2">
-            <label for="email">Email address</label>
-            <input bind:value={email} type="email" id="email" name="email" required class="border-b">
-        </div>
+            <div class="flex flex-col gap-2">
+                <label for="email">Email address</label>
+                <input bind:value={email} type="email" id="email" name="email" required class="border-b">
+            </div>
 
-        <div class="flex flex-col gap-2">
-            <label for="username">Username</label>
-            <input bind:value={username} type="text" id="username" name="username" required class="border-b">
-        </div>
+            <div class="flex flex-col gap-2">
+                <label for="username">Username</label>
+                <input bind:value={username} type="text" id="username" name="username" required class="border-b">
+            </div>
 
-        <div class="flex flex-col gap-2">
-            <label for="password">Password</label>
-            <input bind:value={password} type="password" id="password" name="password" required class="border-b">
-        </div>
+            <div class="flex flex-col gap-2">
+                <label for="password">Password</label>
+                <input bind:value={password} type="password" id="password" name="password" required class="border-b">
+            </div>
 
-        <div class="flex gap-2">
-            <label for="remember">Remember me</label>
-            <input bind:checked={remember} type="checkbox" id="remember" name="remember" class="border-b">
-        </div>
+            <div class="flex gap-2">
+                <label for="remember">Remember me</label>
+                <input bind:checked={remember} type="checkbox" id="remember" name="remember" class="border-b">
+            </div>
 
-        <button class="text-left border rounded-md p-2">
-            Register
-        </button>
+            <button class="text-left border rounded-md p-2">
+                Register
+            </button>
 
-        <button 
-            type="button"
-            class="text-left underline" 
-            onclick={() => {
-                showing = 'login'
-            }}
-        >
-            Already have an account?
-        </button>
+            <button 
+                type="button"
+                class="text-left underline" 
+                onclick={() => {
+                    showing = 'login'
+                }}
+            >
+                Already have an account?
+            </button>
 
-    </form>
-{/if}
+        </form>
+    {/if}
+</div>
 
 {#if errors.length > 0}
     <div class="flex flex-col gap-2 m-4">

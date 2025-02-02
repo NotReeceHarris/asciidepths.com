@@ -16,6 +16,8 @@ prisma.user.updateMany({
     data: { online: false },
 }).then(() => {
     console.log('All users set to offline');
+}).catch((error) => {
+    return null
 })
 
 const app = express();
@@ -57,7 +59,9 @@ app.post('/auth/login', async (req: Request, res: Response): Promise<any> => {
     const user = await prisma.user.findUnique({
         where: { email },
         select: { id: true, username: true, password: true },
-    });
+    }).catch((error) => {
+        return null
+    })
 
     if (!user || !(await argon2.verify(user.password, password))) {
         return res.status(400).json({ success: false, errors: ['Incorrect email or password.'] });
@@ -94,7 +98,9 @@ app.post('/auth/register', async (req: Request, res: Response): Promise<any> => 
     const existingUser = await prisma.user.findFirst({
         where: { OR: [{ email }, { username }] },
         select: { id: true, email: true, username: true },
-    });
+    }).catch((error) => {
+        return null
+    })
 
     if (existingUser) {
         if (existingUser.email === email) errors.push('Email already in use.');
@@ -116,7 +122,20 @@ app.post('/auth/register', async (req: Request, res: Response): Promise<any> => 
             posx: 0,
             posy: 0,
         },
-    });
+    }).catch((error) => {
+        return null
+    })
+
+    if (!user) {
+
+        await prisma.user.delete({
+            where: { email }
+        }).catch((error) => {
+            return null
+        })
+
+        return res.status(500).json({ success: false, errors: ['Failed to create user.'] });
+    }
 
     const session = await generateSessionPayload(user.id);
     res.status(200).json({ success: true, session, username: user.username });
@@ -138,6 +157,8 @@ app.post('/auth/validate', async (req: Request, res: Response): Promise<any> => 
             id: true, 
             encryptionKey: true 
         },
+    }).catch((error) => {
+        return null
     })
 
     if (!user) {
@@ -170,54 +191,6 @@ function getMap(id: string, name: string): {
     mapCache.set(id, { background, highlight, floor });
     return { background, highlight, floor };
 }
-
-/* app.get('/map', async (req: Request, res: Response): Promise<any> => {
-
-    const headers = req.headers;
-    const authorization = headers.authorization;
-
-    if (!authorization || !authorization.startsWith('Bearer ')) {
-        return res.status(400).json({ success: false, errors: ['Invalid session.'] });
-    }
-
-    const decoded = base64url.decode(authorization.split(' ')[1]);
-    const [username, payload] = decoded.split(':');
-
-    if (!username || !payload) {
-        return res.status(400).json({ success: false, errors: ['Invalid session.'] });
-    }
-
-    const user = await prisma.user.findUnique({
-        where: { 
-            username: username.trim()
-        },
-        select: { 
-            id: true, 
-            encryptionKey: true ,
-            location: {
-                select: {
-                    id: true,
-                    name: true,
-                }
-            }
-        },
-    })
-
-    if (!user) {
-        return res.status(400).json({ success: false, errors: ['Invalid session'] });
-    }
-
-    if (mapCache.has(user.location.id)) {
-        return res.status(200).json({ success: true, map: mapCache.get(user.location.id) });
-    }
-
-    const map = fs.readFileSync(`./maps/${user.location.name}.txt`, 'utf8');
-    mapCache.set(user.location.id, map);
-
-    console.log(map);
-
-    res.status(200).json({ success: true, username });
-}); */
 
 // Socket.IO connection handling
 io.on('connection', async (socket) => {
@@ -253,6 +226,8 @@ io.on('connection', async (socket) => {
             posy: true,
             online: true,
         },
+    }).catch((error) => {
+        return null
     })
 
     if (!user) {
@@ -279,6 +254,8 @@ io.on('connection', async (socket) => {
         data: {
             online: true,
         },
+    }).catch((error) => {
+        return null
     })
 
     console.log(`user authenticated as "${username}"`);
@@ -316,9 +293,11 @@ io.on('connection', async (socket) => {
             posx: true,
             posy: true,
         }
+    }).catch((error) => {
+        return null
     })
 
-    if (users_in_location.length > 0) {
+    if (users_in_location && users_in_location.length > 0) {
         socket.send({
             event: 'user_enter_sight',
             data: {
@@ -373,7 +352,9 @@ io.on('connection', async (socket) => {
                     ]
                 },
             });
-        });
+        }).catch((error) => {
+            return null
+        })
     });
 
     socket.on('disconnect', async () => {
@@ -382,6 +363,8 @@ io.on('connection', async (socket) => {
             data: {
                 online: false,
             },
+        }).catch((error) => {
+            return null
         })
 
         console.log('user disconnected');
