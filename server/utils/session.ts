@@ -35,7 +35,7 @@ export function decrypt(text: string, key: Buffer): string | null {
     }
 }
 
-export async function generateSessionPayload(id: number): Promise<string | null> {
+export async function generateSessionPayload(id: string): Promise<string | null> {
     const user = await prisma.user.findUnique({
         where: { id },
         select: {
@@ -56,7 +56,7 @@ export async function generateSessionPayload(id: number): Promise<string | null>
     return encrypt(payload, Buffer.from(user.encryptionKey, 'hex'));
 }
 
-export async function validateSessionPayload(payload: string, key: string): Promise<{ id: number; username: string } | null> {
+export async function validateSessionPayload(payload: string, key: string): Promise<{ id: string; username: string } | null> {
     const decrypted = decrypt(payload, Buffer.from(key, 'hex'));
     if (!decrypted) return null;
 

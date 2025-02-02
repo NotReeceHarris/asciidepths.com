@@ -4,14 +4,11 @@ const x_offset = Math.floor(font_size / 1.6)
 const y_offset = font_size + 5
 
 function drawTile(ctx: CanvasRenderingContext2D, tile: string, X: number, Y: number): void {
-    console.log(tile);
-
     for (let y = 0; y < tile.split('\n').length; y++) {
         const line = tile.split('\n')[y].split('');
 
         for (let x = 0; x < line.length; x++) {
             const char = line[x];
-            console.log(char);
 
             ctx.fillText(char, (X+x) * x_offset, (1+Y+y) * y_offset);
         }
@@ -28,11 +25,10 @@ export function draw(canvas: HTMLCanvasElement, map: {background: string, highli
 
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
+    ctx.font = font;
 
     ctx.fillStyle = 'black';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    ctx.font = font;
 
     ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
     drawTile(ctx, map.background, 0, 0);
@@ -46,11 +42,9 @@ export function draw(canvas: HTMLCanvasElement, map: {background: string, highli
     const player_char = '_';
     const other_player_char = '_';
     
-    ctx.font = font;
     ctx.fillStyle = 'white';
     ctx.fillText(player_char, posx * x_offset, posy * y_offset);
 
-    ctx.font = font;
     ctx.fillStyle = 'green';
     
     for (const [username, player] of Object.entries(players)) {
@@ -59,13 +53,8 @@ export function draw(canvas: HTMLCanvasElement, map: {background: string, highli
         const x = player.x * x_offset;
         const y = player.y * y_offset;
 
-        if (x == posx * x_offset && y == posy * y_offset) {
-            continue;
-        }
-
-        if (x > canvas.width || y > canvas.height) {
-            continue;
-        }
+        if (x == posx * x_offset && y == posy * y_offset) continue;
+        if (x > canvas.width || y > canvas.height) continue;
 
         ctx.fillText(other_player_char, x, y);
     }

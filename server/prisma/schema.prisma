@@ -12,14 +12,14 @@ datasource db {
 
 
 model User {
-  id            Int       @id @default(autoincrement())
+  id            String       @id @default(cuid())
   email         String    @unique
   username      String    @unique
   password      String    @unique
   encryptionKey String
   online        Boolean   @default(false)
 
-  locationId    Int
+  locationId    String
   location      Location  @relation(fields: [locationId], references: [id])
 
   posx          Float   @default(0)
@@ -27,11 +27,13 @@ model User {
 
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+
+  inventory     Inventory[]
 }
 
 model Location {
-  id       Int      @id @default(autoincrement())
-  name      String
+  id       String       @id @default(cuid())
+  name      String  @unique
 
   spawnx    Float  @default(0)
   spawny    Float @default(0)
@@ -40,4 +42,46 @@ model Location {
   updatedAt DateTime @updatedAt
 
   users     User[]
+}
+
+model Inventory {
+  id       String       @id @default(cuid())
+  qty      Int
+
+  userId   String
+  user     User     @relation(fields: [userId], references: [id])
+
+  itemId   String
+  item     Item     @relation(fields: [itemId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Item {
+  id       String       @id @default(cuid())
+  name     String  @unique
+  description String
+  type     String 
+
+  weight   Int
+  
+  rarityId String
+  rarity   Rarity   @relation(fields: [rarityId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  inventories Inventory[]
+}
+
+model Rarity {
+  id       String       @id @default(cuid())
+  name     String   @unique
+  colour   String  @default("#ffffff")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items    Item[]
 }

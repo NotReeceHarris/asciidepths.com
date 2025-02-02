@@ -108,7 +108,11 @@ app.post('/auth/register', async (req: Request, res: Response): Promise<any> => 
             username,
             password: await argon2.hash(password),
             encryptionKey: randomBytes(32).toString('hex'),
-            locationId: 1,
+            location: {
+                connect: {
+                    name: 'stonestoryrpg.com'
+                }
+            },
             posx: 0,
             posy: 0,
         },
