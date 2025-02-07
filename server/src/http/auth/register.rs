@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use sea_orm::*;
 
 use crate::structs::AppState;
-use crate::utilises::{hash_password, validate_email, validate_username, verify_password};
+use crate::utilities::{hash_password, validate_email, validate_username, verify_password};
 use crate::entities::{prelude::*, *};
 
 #[derive(Serialize, Deserialize, Debug)]

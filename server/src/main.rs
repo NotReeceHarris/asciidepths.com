@@ -26,7 +26,7 @@ use dotenvy::dotenv;
 
 mod entities;
 mod constants;
-mod utilises;
+mod utilities;
 mod structs;
 mod http {pub mod auth;}
 mod socket {pub mod connect;}
