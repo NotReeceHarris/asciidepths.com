@@ -17,6 +17,8 @@ impl MigrationTrait for Migration {
                     .col(string(Users::Email).not_null().unique_key())
                     .col(string(Users::Password).not_null())
 
+                    .col(string(Users::SessionKey).not_null().unique_key().string_len(64))
+
                     .col(
                         date_time(Users::CreatedAt)
                             .not_null()
@@ -44,9 +46,13 @@ impl MigrationTrait for Migration {
 enum Users {
     Table,
     Id,
+
     Username,
     Email,
     Password,
+
+    SessionKey,
+
     CreatedAt,
     UpdatedAt
 }

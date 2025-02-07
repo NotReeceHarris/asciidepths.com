@@ -28,11 +28,14 @@ mod entities;
 mod constants;
 mod utilities;
 mod structs;
-mod http {pub mod auth;}
+mod http;
 mod socket {pub mod connect;}
 
 // Import handlers, events and constants
-use http::auth::{login_handler, register_handler, validate_handler};
+use http::{
+    index_handler,
+    auth::{login_handler, register_handler, validate_handler}
+};
 use socket::connect::connect_event;
 use constants::{ALLOWED_ORIGIN, PORT};
 use structs::AppState;
@@ -65,7 +68,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let ws_state = state.clone();
 
     // Set up the root namespace with the `connect_event` handler
-    io.ns("/", move |socket: SocketRef| {
+    io.ns("/socket.io", move |socket: SocketRef| {
         let state = ws_state.clone();
         async move {
             connect_event(socket, state).await;
@@ -74,7 +77,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Define the Axum router with routes for the root path and authentication handlers
     let app = Router::new()
-        .route("/", get(|| async { "Hello, World!" }))  // Root route
+        .route("/", get(index_handler))  // Root route
         .route("/auth/login", post(login_handler))              // Login route
         .route("/auth/register", post(register_handler))        // Register route
         .route("/auth/validate", post(validate_handler))        // Validate route

@@ -27,8 +27,7 @@
         .then(res=>res.json())
         .then((res) => {
             if (res.success) {
-                const session = `${res.username}:${res.session}`;
-                Cookies.set('session', session, { ...( remember ? {expires: 7} : {} ), path: '/' });
+                Cookies.set('session', res.session, { ...( remember ? {expires: 7} : {} ), path: '/' });
                 goto('/app');
             } else {
                 errors = res.errors;
@@ -55,8 +54,7 @@
         .then(res=>res.json())
         .then((res) => {
             if (res.success) {
-                const session = `${res.username}:${res.session}`;
-                Cookies.set('session', session, { ...( remember ? {expires: 7} : {} ), path: '/' });
+                Cookies.set('session', res.session, { ...( remember ? {expires: 7} : {} ), path: '/' });
                 goto('/app');
             } else {
                 errors = res.errors;

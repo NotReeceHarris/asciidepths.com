@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use sea_orm::*;
 
 use crate::structs::AppState;
-use crate::utilities::{hash_password, validate_email, validate_username, verify_password};
+use crate::utilities::{generate_session, generate_session_key, hash_password, validate_email, validate_username};
 use crate::entities::{prelude::*, *};
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -17,8 +17,7 @@ pub struct Request {
 pub struct Response {
     pub success: bool,
     pub errors: Vec<String>,
-    pub session: Option<String>,
-    pub username: Option<String>,
+    pub session: Option<String>
 }
 
 pub async fn register_handler(State(state): State<AppState>, Json(payload): Json<Request>) -> Json<Response> {
@@ -30,8 +29,7 @@ pub async fn register_handler(State(state): State<AppState>, Json(payload): Json
         return Json(Response {
             success: false,
             errors: vec![String::from("Invalid username")],
-            session: None,
-            username: None,
+            session: None
         });
     }
 
@@ -40,8 +38,7 @@ pub async fn register_handler(State(state): State<AppState>, Json(payload): Json
         return Json(Response {
             success: false,
             errors: vec![String::from("Username, password, and email are required")],
-            session: None,
-            username: None,
+            session: None
         });
     }
 
@@ -49,8 +46,7 @@ pub async fn register_handler(State(state): State<AppState>, Json(payload): Json
         return Json(Response {
             success: false,
             errors: vec![String::from("Invalid email address")],
-            session: None,
-            username: None,
+            session: None
         });
     }
 
@@ -59,8 +55,7 @@ pub async fn register_handler(State(state): State<AppState>, Json(payload): Json
         return Json(Response {
             success: false,
             errors: vec![String::from("Invalid username")],
-            session: None,
-            username: None,
+            session: None
         });
     }
 
@@ -87,8 +82,7 @@ pub async fn register_handler(State(state): State<AppState>, Json(payload): Json
             return Json(Response {
                 success: false,
                 errors: vec![String::from(error)],
-                session: None,
-                username: None,
+                session: None
             });
         }
         Err(err) => {
@@ -98,16 +92,18 @@ pub async fn register_handler(State(state): State<AppState>, Json(payload): Json
             return Json(Response {
                 success: false,
                 errors: vec![String::from("Internal server error.")],
-                session: None,
-                username: None,
+                session: None
             });
         }
     }
 
+    let session_key = generate_session_key();
+
     let new_user = users::ActiveModel {
-        username: ActiveValue::Set(normalized_username.to_owned()),
+        username: ActiveValue::Set(normalized_username.clone()),
         email: ActiveValue::Set(payload.email.clone()),
         password: ActiveValue::Set(hash_password(&payload.password)),
+        session_key: ActiveValue::Set(session_key.clone()),
         ..Default::default()
     };
 
@@ -120,18 +116,16 @@ pub async fn register_handler(State(state): State<AppState>, Json(payload): Json
             return Json(Response {
                 success: false,
                 errors: vec![String::from("Internal server error")],
-                session: None,
-                username: None,
+                session: None
             })
         }
     };
 
-    println!("User registered: {:?}", res);
+    let session = generate_session(res.last_insert_id, normalized_username.to_owned(), session_key.to_owned());
 
     Json(Response {
         success: false,
-        errors: vec![String::from("pass")],
-        session: None,
-        username: Some(normalized_username),
+        errors: vec![],
+        session: Some(session)
     })
 }
