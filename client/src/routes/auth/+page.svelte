@@ -148,12 +148,13 @@
 
         </form>
     {/if}
-</div>
 
-{#if errors.length > 0}
+    {#if errors.length > 0}
     <div class="flex flex-col gap-2 m-4">
         {#each errors as error}
             <p class="text-red-500">{error}</p>
         {/each}
     </div>
 {/if}
+
+</div>

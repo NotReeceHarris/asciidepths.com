@@ -12,7 +12,7 @@ import indexRoute from './routes/index';
 
 // CORS configuration for Express and Socket.IO
 const corsOptions = {
-    origin: 'http://localhost:4173', // Allow only this origin
+    origin: 'http://localhost:5173', // Allow only this origin
     methods: ['GET', 'POST'], // Allowed HTTP methods
     credentials: true, // Allow credentials
 };
