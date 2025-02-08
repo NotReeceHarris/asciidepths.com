@@ -2332,6 +2332,7 @@ dependencies = [
  "ahash 0.8.11",
  "argon2",
  "axum",
+ "base64",
  "chrono",
  "cuid2",
  "dotenvy",

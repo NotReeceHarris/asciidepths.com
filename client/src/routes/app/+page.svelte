@@ -112,16 +112,15 @@
 			connected = socket.connected;
 		})
 
+		socket.on('authenticated', (packet) => {
+			authenticated = true;
+			myUsername = packet.username;
+		})
+
 		socket.on('message', (packet) => {
 
 			connected = socket.connected;
 			const { event, data } = packet;
-
-			if (event === 'authenticated') {
-				authenticated = true;
-				myUsername = data.username;
-				return;
-			}
 
 			if (event === 'location') {
 				location = data.location;
@@ -203,7 +202,7 @@
 					{#if location}<span class="text-white">map: {location}</span>{/if}
 				</div>
 
-				<canvas bind:this={canvas} onclick="{handleCanvasClick}" class="w-screen h-screen"></canvas>
+				<canvas bind:this={canvas} onclick="{handleCanvasClick}" class="w-screen h-screen bg-black"></canvas>
 			{:else}
 
 				{#if !connected}

@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "migrate:fresh": "sea-orm-cli migrate fresh",
-    "entity": "sea-orm-cli generate entity -o src/entities"
+    "entity": "sea-orm-cli generate entity -o src/entities",
+    "dev": "cargo watch -x run"
   }
 }

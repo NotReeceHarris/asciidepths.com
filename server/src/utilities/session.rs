@@ -1,12 +1,11 @@
 use aes_gcm::{AeadInPlace, Aes256Gcm, Key, KeyInit, Nonce};
-use aes_gcm::aead::generic_array::GenericArray;
 use rand::RngCore;
 use hex;
 
 /// Generates a random 256-bit (32-byte) AES key and returns it as a hex string
 pub fn generate_session_key() -> String {
     let mut key = [0u8; 32]; // 256-bit key (AES-256)
-    rand::thread_rng().fill_bytes(&mut key);
+    rand::rng().fill_bytes(&mut key);
     hex::encode(key) // Convert to hex string
 }
 
@@ -23,7 +22,7 @@ pub fn generate_session(user_id: i32, username: String, session_key: String) -> 
 
     // Generate a random 12-byte IV (nonce)
     let mut nonce_bytes = [0u8; 12];
-    rand::thread_rng().fill_bytes(&mut nonce_bytes);
+    rand::rng().fill_bytes(&mut nonce_bytes);
     let nonce = Nonce::from_slice(&nonce_bytes);
 
     // Convert `user_id` to bytes (4 bytes for i32)

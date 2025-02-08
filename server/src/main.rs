@@ -1,6 +1,11 @@
 use axum::{
     http::{
-        header::HeaderValue, 
+        header::{
+            HeaderValue, 
+            CONTENT_TYPE,
+            AUTHORIZATION,
+            ORIGIN
+        },
         Method
     },
     routing::{
@@ -10,9 +15,15 @@ use axum::{
     Router
 };
 
-use tower_http::cors::{
-    Any, 
-    CorsLayer
+use tower_http::cors::CorsLayer;
+
+use http::{
+    index_handler,
+    auth::{
+        login_handler, 
+        register_handler, 
+        validate_handler
+    }
 };
 
 use socketioxide::extract::SocketRef;
@@ -32,10 +43,7 @@ mod http;
 mod socket {pub mod connect;}
 
 // Import handlers, events and constants
-use http::{
-    index_handler,
-    auth::{login_handler, register_handler, validate_handler}
-};
+
 use socket::connect::connect_event;
 use constants::{ALLOWED_ORIGIN, PORT};
 use structs::AppState;
@@ -45,10 +53,15 @@ use structs::AppState;
 static CORS: Lazy<CorsLayer> = Lazy::new(|| {
     CorsLayer::new()
         .allow_methods([Method::GET, Method::POST, Method::OPTIONS]) // Allow specific HTTP methods
-        .allow_origin(ALLOWED_ORIGIN.parse::<HeaderValue>().unwrap()) // Allow requests from the specified origin
-        .allow_headers(Any) // Allow all headers
+        .allow_origin(ALLOWED_ORIGIN.parse::<HeaderValue>().unwrap()) 
+        //.allow_headers(Any) // Allow all headers
+        .allow_headers([
+            CONTENT_TYPE,
+            AUTHORIZATION,
+            ORIGIN
+        ])
+        .allow_credentials(true) // Allow credentials (Cookies, Authorization headers)
 });
-
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -68,7 +81,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let ws_state = state.clone();
 
     // Set up the root namespace with the `connect_event` handler
-    io.ns("/socket.io", move |socket: SocketRef| {
+    io.ns("/", move |socket: SocketRef| {
         let state = ws_state.clone();
         async move {
             connect_event(socket, state).await;

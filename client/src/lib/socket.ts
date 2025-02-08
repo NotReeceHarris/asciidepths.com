@@ -57,10 +57,14 @@ export function connect(session: string): Socket {
     const token = base64URLencode(`${username}:${payload}`);
 
     return io(PUBLIC_SERVER_ADDRESS, {
+        transports: ['websocket'],
         autoConnect: true,
         reconnection: true,
         extraHeaders: {
             authorization: `Bearer ${token}`,
         },
+        query: {
+            token
+        }
     });
 }
