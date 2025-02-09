@@ -40,7 +40,7 @@ mod constants;
 mod utilities;
 mod structs;
 mod http;
-mod socket {pub mod connect;}
+mod socket {pub mod connect; pub mod disconnect;}
 
 // Import handlers, events and constants
 

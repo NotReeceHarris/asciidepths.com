@@ -18,6 +18,8 @@ impl MigrationTrait for Migration {
                     .col(string(Users::Password).not_null())
 
                     .col(string(Users::SessionKey).not_null().unique_key().string_len(64))
+                    .col(ColumnDef::new(Users::SocketId).string().null().unique_key())
+                    .col(boolean(Users::Online).not_null().default(false))
 
                     .col(
                         date_time(Users::CreatedAt)
@@ -52,6 +54,9 @@ enum Users {
     Password,
 
     SessionKey,
+
+    SocketId,
+    Online,
 
     CreatedAt,
     UpdatedAt

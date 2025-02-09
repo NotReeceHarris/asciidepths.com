@@ -16,19 +16,21 @@ pub struct Request {
 pub struct Response {
     pub success: bool,
     pub errors: Vec<String>,
-    pub session: Option<String>
+    pub session: Option<String>,
 }
 
-pub async fn login_handler(State(state): State<AppState>, Json(payload): Json<Request>) -> Json<Response> {
-
-    let db = &state.db;     // Access the database
+pub async fn login_handler(
+    State(state): State<AppState>,
+    Json(payload): Json<Request>,
+) -> Json<Response> {
+    let db = &state.db; // Access the database
 
     // Validate fields
     if payload.password.is_empty() || payload.email.is_empty() {
         return Json(Response {
             success: false,
-            errors: vec![String::from("Email and password is required")],
-            session: None
+            errors: vec![String::from("Email and password are required")],
+            session: None,
         });
     }
 
@@ -36,70 +38,68 @@ pub async fn login_handler(State(state): State<AppState>, Json(payload): Json<Re
         return Json(Response {
             success: false,
             errors: vec![String::from("Email or password is incorrect")],
-            session: None
+            session: None,
         });
     }
 
+    // Find the user by email
     let user = match Users::find()
-    .filter(users::Column::Email.eq(&payload.email))
-    .one(db.as_ref())
-    .await {
+        .filter(users::Column::Email.eq(&payload.email))
+        .one(db.as_ref())
+        .await
+    {
+        Ok(Some(user)) => user,
         Ok(None) => {
             return Json(Response {
                 success: false,
                 errors: vec![String::from("Email or password is incorrect")],
-                session: None
+                session: None,
             });
-        } // Continue
-        Ok(Some(user)) => user,
+        }
         Err(err) => {
-            // Handle database error
             eprintln!("Error querying database: {:?}", err);
-            // Return some response indicating a failure
             return Json(Response {
                 success: false,
-                errors: vec![String::from("Internal server error.")],
-                session: None
+                errors: vec![String::from("Internal server error")],
+                session: None,
             });
         }
     };
 
+    // Verify the password
     if !verify_password(&payload.password, &user.password) {
         return Json(Response {
             success: false,
             errors: vec![String::from("Email or password is incorrect")],
-            session: None
+            session: None,
         });
     }
 
+    // Generate a new session key
     let session_key = generate_session_key();
 
+    // Update the user's session key
     let updated_user = users::ActiveModel {
         id: ActiveValue::Set(user.id),
         session_key: ActiveValue::Set(session_key.clone()),
         ..Default::default()
     };
 
-    match updated_user.clone().update(db.as_ref()).await {
-        Ok(_user) => {},
-        Err(err) => {
-            // Handle database error
-            eprintln!("Error querying database: {:?}", err);
-            // Return some response indicating a failure
-            return Json(Response {
-                success: false,
-                errors: vec![String::from("Internal server error")],
-                session: None
-            })
-        }
-    };
+    if let Err(err) = updated_user.update(db.as_ref()).await {
+        eprintln!("Error updating user in database: {:?}", err);
+        return Json(Response {
+            success: false,
+            errors: vec![String::from("Internal server error")],
+            session: None,
+        });
+    }
 
-    let session = generate_session(user.id, user.username, session_key.to_owned());
+    // Generate a session token
+    let session = generate_session(user.id, user.username, session_key);
 
-    return Json(Response {
+    Json(Response {
         success: true,
         errors: vec![],
-        session: Some(session)
-    });
-
+        session: Some(session),
+    })
 }

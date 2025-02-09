@@ -17,11 +17,14 @@ pub struct Request {
 pub struct Response {
     pub success: bool,
     pub errors: Vec<String>,
-    pub session: Option<String>
+    pub session: Option<String>,
 }
 
-pub async fn register_handler(State(state): State<AppState>, Json(payload): Json<Request>) -> Json<Response> {
-    let db = &state.db;     // Access the database
+pub async fn register_handler(
+    State(state): State<AppState>,
+    Json(payload): Json<Request>,
+) -> Json<Response> {
+    let db = &state.db; // Access the database
     let normalized_username = payload.username.trim().to_lowercase();
 
     // Check if username is in the cache (fast rejection)
@@ -29,7 +32,7 @@ pub async fn register_handler(State(state): State<AppState>, Json(payload): Json
         return Json(Response {
             success: false,
             errors: vec![String::from("Invalid username")],
-            session: None
+            session: None,
         });
     }
 
@@ -38,7 +41,7 @@ pub async fn register_handler(State(state): State<AppState>, Json(payload): Json
         return Json(Response {
             success: false,
             errors: vec![String::from("Username, password, and email are required")],
-            session: None
+            session: None,
         });
     }
 
@@ -46,7 +49,7 @@ pub async fn register_handler(State(state): State<AppState>, Json(payload): Json
         return Json(Response {
             success: false,
             errors: vec![String::from("Invalid email address")],
-            session: None
+            session: None,
         });
     }
 
@@ -55,24 +58,21 @@ pub async fn register_handler(State(state): State<AppState>, Json(payload): Json
         return Json(Response {
             success: false,
             errors: vec![String::from("Invalid username")],
-            session: None
+            session: None,
         });
     }
 
-    // Check if email is already in use
+    // Check if email or username is already in use
     match Users::find()
-    .filter(
-        Condition::any()  // This allows for OR conditions
-            .add(users::Column::Email.eq(&payload.email))
-            .add(users::Column::Username.eq(&normalized_username))
-    )
-    .one(db.as_ref())
-    .await {
-        Ok(None) => {} // Continue
+        .filter(
+            Condition::any()
+                .add(users::Column::Email.eq(&payload.email))
+                .add(users::Column::Username.eq(&normalized_username)),
+        )
+        .one(db.as_ref())
+        .await
+    {
         Ok(Some(user)) => {
-
-            println!("User already exists: {:?}", user);
-
             let error = if user.email == payload.email {
                 "Email already in use"
             } else {
@@ -82,23 +82,24 @@ pub async fn register_handler(State(state): State<AppState>, Json(payload): Json
             return Json(Response {
                 success: false,
                 errors: vec![String::from(error)],
-                session: None
+                session: None,
             });
         }
+        Ok(None) => {} // Continue
         Err(err) => {
-            // Handle database error
             eprintln!("Error querying database: {:?}", err);
-            // Return some response indicating a failure
             return Json(Response {
                 success: false,
-                errors: vec![String::from("Internal server error.")],
-                session: None
+                errors: vec![String::from("Internal server error")],
+                session: None,
             });
         }
     }
 
+    // Generate a new session key
     let session_key = generate_session_key();
 
+    // Create a new user
     let new_user = users::ActiveModel {
         username: ActiveValue::Set(normalized_username.clone()),
         email: ActiveValue::Set(payload.email.clone()),
@@ -107,25 +108,25 @@ pub async fn register_handler(State(state): State<AppState>, Json(payload): Json
         ..Default::default()
     };
 
+    // Insert the new user into the database
     let res = match Users::insert(new_user).exec(db.as_ref()).await {
         Ok(user) => user,
         Err(err) => {
-            // Handle database error
-            eprintln!("Error querying database: {:?}", err);
-            // Return some response indicating a failure
+            eprintln!("Error inserting user into database: {:?}", err);
             return Json(Response {
                 success: false,
                 errors: vec![String::from("Internal server error")],
-                session: None
-            })
+                session: None,
+            });
         }
     };
 
-    let session = generate_session(res.last_insert_id, normalized_username.to_owned(), session_key.to_owned());
+    // Generate a session token
+    let session = generate_session(res.last_insert_id, normalized_username, session_key);
 
     Json(Response {
-        success: false,
+        success: true,
         errors: vec![],
-        session: Some(session)
+        session: Some(session),
     })
 }

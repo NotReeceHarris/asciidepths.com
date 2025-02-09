@@ -4,6 +4,10 @@
   "scripts": {
     "migrate:fresh": "sea-orm-cli migrate fresh",
     "entity": "sea-orm-cli generate entity -o src/entities",
-    "dev": "cargo watch -x run"
+    "dev": "cargo watch -x run",
+    "clean:db": "rimraf dev.db src/entities && npm run migrate:fresh && npm run entity"
+  },
+  "devDependencies": {
+    "rimraf": "^6.0.1"
   }
 }

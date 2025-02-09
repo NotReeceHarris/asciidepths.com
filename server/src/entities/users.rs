@@ -14,6 +14,9 @@ pub struct Model {
     pub password: String,
     #[sea_orm(unique)]
     pub session_key: String,
+    #[sea_orm(unique)]
+    pub socket_id: Option<String>,
+    pub online: bool,
     pub created_at: DateTime,
     pub updated_at: DateTime,
 }
